@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.dao.UserDAO;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.repository.RoleRepository;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
 @Service
@@ -26,6 +27,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private RoleRepository roleRepository;
 
   private PasswordEncoder passwordEncoder(){
     return new BCryptPasswordEncoder();
@@ -74,5 +78,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
   private Collection<? extends GrantedAuthority> mapRolesAuthorities(Collection<Role> roles) {
     return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+  }
+
+  @Transactional
+  public List<Role> listRoles() {
+    return roleRepository.findAll();
   }
 }

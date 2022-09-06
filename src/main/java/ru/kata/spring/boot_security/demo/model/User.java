@@ -40,13 +40,24 @@ public class User {
     inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Collection<Role> roles;
 
+  public void addRole(Role role) {
+    this.roles.add(role);
+  }
+
   public User() {
 
   }
 
-  public User(String name, String surname, int yearOfBirth) {
+  public User(long id, String username, String password, String name, String surname,
+      int yearOfBirth,
+      Collection<Role> roles) {
+    this.id = id;
+    this.username = username;
+    this.password = password;
     this.name = name;
     this.surname = surname;
     this.yearOfBirth = yearOfBirth;
+    this.roles = roles;
   }
+
 }

@@ -47,10 +47,10 @@
     </div>
 
     <div class="form-floating mb-3">
-
-        <input type="text" class="form-control" th:field="*{roles}" id="floatingRoles"
-               placeholder="Ivan">
-        <label  for="floatingName">Role</label>
+      <th:block th:each="role: ${listRoles}">
+        <input type="checkbox" th:field="*{roles}"
+               th:text="${role.name}" th:value="${role.id}" class="m-2" id="roles"/>
+      </th:block>
     </div>
 
     <div class="form-floating mb-3">
