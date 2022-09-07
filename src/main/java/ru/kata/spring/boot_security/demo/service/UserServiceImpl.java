@@ -31,14 +31,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Autowired
   private RoleRepository roleRepository;
 
-  private PasswordEncoder passwordEncoder(){
+  private PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
 
   @Transactional
   @Override
   public void saveUser(User user) {
-    user.setPassword(passwordEncoder().encode(user.getPassword()));
+    System.out.println("User password is:" + user.getPassword());
+    if (!show(user.getId()).getPassword().equals(user.getPassword())) {
+      user.setPassword(passwordEncoder().encode(user.getPassword()));
+    }
     userRepository.save(user);
   }
 
@@ -69,7 +72,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = findByUsername(username);
-    if(user == null) {
+    if (user == null) {
       throw new UsernameNotFoundException(String.format("User '%s' not found", username));
     }
     return new org.springframework.security.core.userdetails.User(user.getUsername(),
@@ -77,7 +80,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
   }
 
   private Collection<? extends GrantedAuthority> mapRolesAuthorities(Collection<Role> roles) {
-    return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+    return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName()))
+        .collect(Collectors.toList());
   }
 
   @Transactional
