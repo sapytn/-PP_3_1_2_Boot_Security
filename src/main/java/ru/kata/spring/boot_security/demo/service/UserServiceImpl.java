@@ -9,7 +9,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,24 +22,36 @@ import ru.kata.spring.boot_security.demo.repository.UserRepository;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
   @Autowired
-  private UserDAO userDAO;
+  private PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private UserRepository userRepository;
+  private final UserDAO userDAO;
 
-  @Autowired
-  private RoleRepository roleRepository;
+  private final UserRepository userRepository;
 
-  private PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+  private final RoleRepository roleRepository;
+
+
+
+
+  public UserServiceImpl(UserDAO userDAO, UserRepository userRepository,
+      RoleRepository roleRepository) {
+    this.userDAO = userDAO;
+    this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
   }
 
   @Transactional
   @Override
   public void saveUser(User user) {
-    System.out.println("User password is:" + user.getPassword());
-    if (!show(user.getId()).getPassword().equals(user.getPassword())) {
-      user.setPassword(passwordEncoder().encode(user.getPassword()));
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    userRepository.save(user);
+  }
+
+  @Transactional
+  @Override
+  public void updateUser(User user) {
+    if (!showUser(user.getId()).getPassword().equals(user.getPassword())) {
+      user.setPassword(passwordEncoder.encode(user.getPassword()));
     }
     userRepository.save(user);
   }
@@ -59,7 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
   @Transactional
   @Override
-  public User show(Long id) {
+  public User showUser(Long id) {
     return userDAO.show(id);
   }
 

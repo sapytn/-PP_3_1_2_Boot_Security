@@ -2,7 +2,6 @@ package ru.kata.spring.boot_security.demo.controller;
 
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +17,14 @@ import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private UserServiceImpl userServiceImpl;
+    private final UserServiceImpl userServiceImpl;
+
+    public AdminController(UserService userService, UserServiceImpl userServiceImpl) {
+        this.userService = userService;
+        this.userServiceImpl = userServiceImpl;
+    }
 
     @GetMapping
     public String showAllUser(Model model) {
@@ -45,12 +47,18 @@ public class AdminController {
         return "redirect:/admin";
     }
 
+    @PostMapping("/edit")
+    public String updateUser(@ModelAttribute("user") User user) {
+        userService.updateUser(user);
+        return "redirect:/admin";
+    }
+
 
     @GetMapping("/edit/{id}")
     public String editUser(@PathVariable("id") long id, Model model) {
-        model.addAttribute("user", userService.show(id));
+        model.addAttribute("user", userService.showUser(id));
         model.addAttribute("listRoles",userServiceImpl.listRoles());
-        return "user-info";
+        return "edit";
     }
 
     @GetMapping("/delete/{id}")

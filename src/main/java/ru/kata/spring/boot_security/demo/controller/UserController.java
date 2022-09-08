@@ -14,8 +14,11 @@ import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 @Controller
 @RequestMapping("/user")
 public class UserController {
-  @Autowired
-  private UserServiceImpl userService;
+  private final UserServiceImpl userService;
+
+  public UserController(UserServiceImpl userService) {
+    this.userService = userService;
+  }
 
   @GetMapping
   public String showUser(Model model, Principal principal) {
